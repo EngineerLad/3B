@@ -11,7 +11,7 @@
 
 #imports
 import os
-
+import numpy as np
 #function definition
 def normsigmoid(x):
     return 1/(1+np.exp(-x))
