@@ -1,9 +1,8 @@
 #Project 3B Comparator VER 0.1.0
 # Takes main framework from DuoNeuro Ver 1.1
-# This is a custom-made, live learning, "back-driveable" neuron. It can either use minimally formatted data model or live data streams containing both 
+# This is a custom-made, live learning capable, "back-driveable" neuron. It can either use minimally formatted data model or live data streams containing both 
 # input and output data to train the weight and bias values, and is equipped with the function to generate both input and output data given the opposite half of the data model.
 # Appends existing weight and bias values to a .txt file for easy access and lightweight storage.
-# WARNING: BACKDRIVEALBLE FUNCTION IS IN DEVELOPMENT. NOT PRESENT IN 0.1.0. COMING SOON
 # FUTURE UPDATE GENERAL NOTES: 
 # Simplify the learning commands for both. Should be easy.
 # Add node data deletion options
@@ -255,7 +254,7 @@ def influx(inputy):
         z += list_of_bias_and_weight_values[number_of_weight_values]
         results[x] = maximum_value_of_set*normsigmoid(z)
     return results
-
+#Efflux: Uses a singular point in the same shape of the original output data used in the model to synthesize a possible input value set.
 def efflux(output):
     results = []
     for x in (number_of_weight_values_BD):
