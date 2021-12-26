@@ -31,24 +31,24 @@ class shapeException(Error):
     pass
 
 #variable definition
-cost = []
-cost_BD = []
-maximum_value_of_set = 0
-maximum_value_of_set_BD = 0
+    cost = []
+    cost_BD = []
+    maximum_value_of_set = 0
+    maximum_value_of_set_BD = 0
 
-number_of_weight_values = 0
-number_of_weight_values_and_bias = 0
-number_of_weight_bias_value_sets = 0
-index_of_bias_value = number_of_weight_values
-list_of_bias_and_weight_values = []
+    number_of_weight_values = 0
+    number_of_weight_values_and_bias = 0
+    number_of_weight_bias_value_sets = 0
+    index_of_bias_value = number_of_weight_values
+    list_of_bias_and_weight_values = []
 
-number_of_weight_values_BD = 0
-number_of_weight_values_and_bias_BD = 0
-number_of_weight_bias_value_sets_BD = 0
-index_of_bias_value_BD = number_of_weight_values_BD
-list_of_bias_and_weight_values_BD = []
+    number_of_weight_values_BD = 0
+    number_of_weight_values_and_bias_BD = 0
+    number_of_weight_bias_value_sets_BD = 0
+    index_of_bias_value_BD = number_of_weight_values_BD
+    list_of_bias_and_weight_values_BD = []
 
-alpha = 0.2
+    alpha = 0.2
 
 def Trainer(inputy, output, iterations):
     #filter 1: checks number of digits in all input and output values, finds the maximum figure. Makes the maximum figure also the maximum figure of the sigmoid function.
