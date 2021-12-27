@@ -16,17 +16,26 @@ cost_BD = []
 list_of_bias_and_weight_values = []
 list_of_bias_and_weight_values_BD = []
 
+maxValuesListi = []
+maxValuesListo = []
+
 number_of_inputs = 0
+#notes on conversion:
+# number of inputs = number of input variables = number of weight values needed
+# number of inputs + 1 = number of weight and bias values needed
 number_of_outputs = 0
 
-alpha = 0.2 
-z = 0
+maximumZ = 0
+maximumZ_BD = 0
 
-def normsigmoid(x):
-    return 1/(1+np.exp(-x))
+alpha = []
+alpha_BD = []
 
-def normsigmoid_p(x):
-    return normsigmoid(x) * (1-normsigmoid(x))
+def normsigmoid(x,b):
+    return 1/(1+np.exp(-x*(1/(b/10))))
+
+def normsigmoid_p(x,b):
+    return normsigmoid(x,b) * (1-normsigmoid(x,b))
 
 
 class Error(Exception):
@@ -35,230 +44,252 @@ class Error(Exception):
 class shapeException(Error):
     pass
 
+def clear():
+    os.system( 'cls' )
 
 
+def fileLoad():
+    global list_of_bias_and_weight_values
+    global list_of_bias_and_weight_values_BD
 
-def fileLoad(aa,bb):
+    templisti = []
+    templisto = []
+    if(os.path.exists('Neuron-DataTESTINGNODE.txt')):
+        datafile = open("Neuron-DataTESTINGNODE.txt","r")
+        lineByLine = datafile.readlines()
+        for data in lineByLine:
+            templisti.append(data.strip())
+            if(len(templisti) == (number_of_inputs + 1)):
+                list_of_bias_and_weight_values.append(templisti)
+                templisti = []
+        datafile.close()
+        
+    else:
+        datafile = open("Neuron-DataTESTINGNODE.txt","w+")
+        for a in range(number_of_outputs):
+            templisti = []
+            for b in range(number_of_inputs + 1): 
+                templisti.append(np.random.uniform(-1,1))
+                datafile.write(str(templisti[b])+"\n")
+            list_of_bias_and_weight_values.append(templisti)
+        datafile.close()
 
-        if(os.path.exists('Neuron-DataTESTINGNODE.txt')):
-            datafile = open("Neuron-DataTESTINGNODE.txt","r")
-            lineByLine = datafile.readlines()
-            counter = 0
-            for data in lineByLine:
-                print("getting stuck here 1")
-                print(str(counter))
-                print(str(data))
-                list_of_bias_and_weight_values.append(data)
-                counter += 1
-            
-        else:
-            datafile = open("Neuron-DataTESTINGNODE.txt","w+")
-            for a in range(bb):
-                for b in range(aa+1):
-                    list_of_bias_and_weight_values.append(np.random.randn())
-                    datafile.write(str(list_of_bias_and_weight_values[b])+"\n")
-
-        if(os.path.exists('Neuron-Data_BDTESTINGNODE.txt')):
-            datafile_BD = open("Neuron-Data_BDTESTINGNODE.txt","r")
-            lineByLine2 = datafile_BD.readlines()
-            counter = 0
-            for data in lineByLine2:
-                print("getting stuck here 2")
-                print(str(counter))
-                print(str(data))
-                list_of_bias_and_weight_values_BD.append(data)
-                counter += 1
-            
-        else:
-            datafile = open("Neuron-Data_BDTESTINGNODE.txt","w+")
-            for a in range(aa):
-                for b in range(bb+1):
-                    list_of_bias_and_weight_values_BD.append(np.random.randn())
-                    datafile.write(str(list_of_bias_and_weight_values_BD[b])+"\n")
-
-
-
+    if(os.path.exists('Neuron-Data_BDTESTINGNODE.txt')):
+        datafile_BD = open("Neuron-Data_BDTESTINGNODE.txt","r")
+        lineByLine2 = datafile_BD.readlines()
+        for data in lineByLine2:
+            templisto.append(data.strip())
+            if(len(templisto) == (number_of_outputs + 1)):
+                list_of_bias_and_weight_values_BD.append(templisto)
+                templisto = []
+        datafile_BD.close()
+                    
+    else:
+        datafile_BD = open("Neuron-Data_BDTESTINGNODE.txt","w+")
+        for a in range(number_of_inputs):
+            templisto = []
+            for b in range(number_of_outputs + 1): 
+                templisto.append(np.random.uniform(-1,1))
+                datafile_BD.write(str(templisto[b])+"\n")
+            list_of_bias_and_weight_values_BD.append(templisto)
+        datafile_BD.close()
 
 def wbUpdate(mode):
     if(mode == 0):
         datafile = open("Neuron-DataTESTINGNODE.txt","w")
-        for a in range(len(inputy)):
-            datafile.write(list_of_bias_and_weight_values[a])
+        for a in range():
+            datafile.write(str(list_of_bias_and_weight_values[b])+"\n")
     if(mode == 1):
         datafile = open("Neuron-Data_BDTESTINGNODE.txt","w")
-        for a in range(len(inputy)):
-            datafile.write(list_of_bias_and_weight_values_BD[a])
+        for a in range():
+            datafile.write(float(list_of_bias_and_weight_values_BD[a].strip()))
     if(mode == 2):
         datafile = open("Neuron-DataTESTINGNODE.txt","w")
-        for a in range(len(inputy)):
-            datafile.write(list_of_bias_and_weight_values[a])
+        for a in range(len(list_of_bias_and_weight_values) * len(list_of_bias_and_weight_values[0])):
+            datafile.write(float(list_of_bias_and_weight_values[a].strip()))
         datafile = open("Neuron-Data_BDTESTINGNODE.txt","w")
-        for a in range(len(inputy)):
-            datafile.write(list_of_bias_and_weight_values_BD[a])
+        for a in range(len(list_of_bias_and_weight_values_BD) * len(list_of_bias_and_weight_values_BD[0])):
+            datafile.write(float(list_of_bias_and_weight_values_BD[a].strip()))
 
 #NEW: Created TRAININGLOOP to minimize the code clutter
-def TrainingLoopCORE(inputy,output,maximum_value,mode):
-    if(mode==0):
-        z = 0
-        for i in range(number_of_outputs):
-            z += (inputy[i]*list_of_bias_and_weight_values[i]) 
-        z += float(list_of_bias_and_weight_values[-1].strip())
+def TrainingLoopCORE(inputy,output,mode):
+    global alpha
+    global alpha_BD
+    global cost
+    global cost_BD
+    global number_of_inputs
+    global number_of_outputs
+    global maxValuesListi
+    global maxValuesListo
+    global list_of_bias_and_weight_values
+    global list_of_bias_and_weight_values_BD
+    global maximumZ
+    global maximumZ_BD
 
-        pred = maximum_value * normsigmoid(z)
-        target = output
-
-        cost.append(np.square(pred - target))
-
-        dcost_dpred = 2 * (pred - target)
-        dpred_dz = maximum_value * normsigmoid_p(z)
-        dcost_dz = dcost_dpred * dpred_dz
-        
-        for i in range(len(inputy)):
-            list_of_bias_and_weight_values[i] = list_of_bias_and_weight_values[i] - alpha * list_of_bias_and_weight_values[i] * dcost_dz
-
-        if(cost[1]>cost[0]):
-            alpha+=0.01
-        if((cost[1]-cost[0])<-0.5):
-            alpha-=0.01
-        cost[0] = cost[1]
-        print(str(cost[0]))
-    if(mode==1):
-        for i in range(number_of_inputs):
-            z += (inputy[i]*list_of_bias_and_weight_values_BD[i]) 
-        z += list_of_bias_and_weight_values_BD[-1]
-
-        pred = maximum_value * normsigmoid(z)
-        target = output
-
-        cost[1] = np.square(pred - target)
-
-        dcost_dpred = 2 * (pred - target)
-        dpred_dz = maximum_value * normsigmoid_p(z)
-        dcost_dz = dcost_dpred * dpred_dz
-        
-        for i in range(len(inputy)):
-            list_of_bias_and_weight_values_BD[i] = list_of_bias_and_weight_values_BD[i] - alpha * list_of_bias_and_weight_values_BD[i] * dcost_dz
-
-        if(cost[1]>cost[0]):
-            alpha+=0.01
-        if((cost[1]-cost[0])<-0.5):
-            alpha-=0.01
-        cost[0] = cost[1]
-        print(str(cost[0]))
     
 
-def TrainingLoopL1(inputy,output,maximum_value):
-    z = 0
-    TrainingLoopCORE(inputy,output,maximum_value,0)
-    print("Forward Cost: " + cost[0])
-    z = 0
-    TrainingLoopCORE(inputy,output,maximum_value,1)
-    print("Backward Cost: " + cost_BD[0])
+    if(mode==0):
+        for a in range(number_of_outputs):
+
+            z = 0
+            for i in range(number_of_inputs):
+                z += (float(inputy[i])*float(list_of_bias_and_weight_values[a][i])) 
+            z += float(list_of_bias_and_weight_values[a][-1])
+            print("value of z" + str(z))
+            print("max value; " + str(maxValuesListi[a]))
+            print("norm sigmoid value: " + str(float(normsigmoid(float(z),maximumZ))))
+            print("derivative of norm sigmoid value: " + str(normsigmoid_p(z,maximumZ)))
+            pred = maxValuesListi[a] * normsigmoid(z,maximumZ)
+            print("pred value; " + str(pred))
+            target = output[a]
+            print("target value; " + str(target))
+            cost[a][1] = (np.square(pred - target))
+
+            dcost_dpred = 2 * (pred - target)
+            print("dcost_dpred: " + str(dcost_dpred))
+            dpred_dz = maxValuesListi[a] * normsigmoid_p(z,maximumZ)
+
+            print("dpred_dz: " + str(dpred_dz))
+            dcost_dz = dcost_dpred * dpred_dz
+            
+            for i in range(number_of_inputs):
+                print("alpha: " + str(alpha[a]))
+                print("dcostdz: " + str(dcost_dz))
+                print("input point: " + str(inputy[i]))
+                print("weight delta :" + str(alpha[a] * dcost_dz * inputy[i]))
+                list_of_bias_and_weight_values[a][i] = float(list_of_bias_and_weight_values[a][i]) - alpha[a] * dcost_dz * inputy[i]
+                print("weight "+ str(i) + " value: " + str(list_of_bias_and_weight_values[a][i]))
+            list_of_bias_and_weight_values[a][number_of_inputs] = float(list_of_bias_and_weight_values[a][number_of_inputs]) - alpha[a] * dcost_dz
+            print("bias value: " + str(list_of_bias_and_weight_values[a][number_of_inputs]))
+            print("previous cost:" + str(cost[a][0]))
+            print("new cost:" + str(cost[a][1]))
+            cost[a][0] = cost[a][1]
+            
+    if(mode==1):
+        for a in range(number_of_inputs):
+
+            z = 0
+            for i in range(number_of_outputs):
+                z += (float(inputy[i])*float(list_of_bias_and_weight_values_BD[a][i])) 
+            z += float(list_of_bias_and_weight_values_BD[a][-1])
+
+            pred = maxValuesListo[a] * normsigmoid(z,maximumZ_BD)
+            target = output[a]
+
+            cost_BD[a].append(np.square(pred - target))
+
+            dcost_dpred = 2 * (pred - target)
+            dpred_dz = maxValuesListo[a] * normsigmoid_p(z,maximumZ_BD)
+            dcost_dz = dcost_dpred * dpred_dz
+            
+            for i in range(number_of_outputs):
+                list_of_bias_and_weight_values_BD[a][i] = float(list_of_bias_and_weight_values_BD[a][i]) - alpha_BD[a] * float(list_of_bias_and_weight_values_BD[a][i]) * dcost_dz
+            
+            if(cost_BD[a][1]>cost_BD[a][0]):
+                alpha_BD[a]+=0.01
+            if((cost_BD[a][1]-cost_BD[a][0])<-0.5):
+                alpha_BD[a]-=0.01
+            cost_BD[a][0] = cost_BD[a][1]
+
+
+    
 
 
  
 def Trainer(inputy, output, iterations):
-    number_of_input = 0
-    number_of_output = 0
+    global number_of_inputs
+    global number_of_outputs
+    global cost
+    global cost_BD
+    global maxValuesListi
+    global maxValuesListo
+    global maximumZ
+    global maximumZ_BD
+    
+
+    maxValuesListi = [max(elem) for elem in zip(*output)]
+    maxValuesListo = [max(elem) for elem in zip(*inputy)]
+
 
     if isinstance(inputy[0], list):
-        number_of_input = len(inputy[0])
+        number_of_inputs = len(inputy[0])
     else:
-        number_of_input = len(inputy)
+        number_of_inputs = len(inputy)
 
     if isinstance(output[0], list):
-        number_of_output = len(output[0])    
+        number_of_outputs = len(output[0])    
     else:
-        number_of_output = len(output)
+        number_of_outputs = len(output)
 
-    print("Number of inputs: " + str(number_of_input))
-    print("Number of outputs: " + str(number_of_output))
+    print("Number of inputs: " + str(number_of_inputs))
+    print("Number of outputs: " + str(number_of_outputs))
+    maximumZ = sum([max(elem) for elem in zip(*output)])
+    maximumZ_BD = sum([max(elem) for elem in zip(*inputy)])
 
-    fileLoad(number_of_input , number_of_output)
-    print("Finished Loading")
+    fileLoad()
 
-    number_of_weight_bias_value_sets = number_of_input + 1
-    number_of_weight_bias_value_sets_BD = number_of_output + 1
+    for x in range(number_of_outputs):
+        costi = []
+        costi.append(10)
+        costi.append(10)
+        cost.append(costi)
+        alpha.append(0.2)
+    for y in range(number_of_outputs):
+        costo = []
+        costo.append(10)
+        costo.append(10)
+        cost_BD.append(costo)
+        alpha_BD.append(0.2)
 
-    print("Assigned here")
-    cost.append(10)
-    cost_BD.append(10)
-    print("Assigned here2")
     if (iterations == 0):
-        print("entered loop")
-        while(cost[0]>0.001):
-            print("confirmation 1")
-            if isinstance(output[0], list):
-                print("confirmation 2")
-                maximum_value = max([sublist[-1] for sublist in output])
-                print("confirmation 3")
-                ri = random.randrange(len(output))
-                print("confirmation 4")
-                for b in range(number_of_output):
-                    
-                    print("running...")
-                    TrainingLoopL1(inputy,output[ri][b],maximum_value)
-                print("confirmation 5")
-            else:
-                maximum_value = max(output)
-                for b in range(len(output)):
-                    print("running...2")
-                    TrainingLoopL1(inputy,output[ri][b],maximum_value)
-
-            if isinstance(inputy[0], list):
-                maximum_value = max([sublist[-1] for sublist in inputy])
-                ri = random.randrange(len(inputy))
-                for b in range(number_of_input):
-                    print("running...3")
-                    TrainingLoopL1(output,inputy[ri][b],maximum_value)
-            else:
-                maximum_value = max(inputy)
-                for b in range(len(inputy)):
-                    print("running...4")
-                    TrainingLoopL1(output,inputy[ri][b],maximum_value)
+        while(float(sum([sum(i) for i in zip(*cost)])) > 0.004 and  float(sum([sum(i) for i in zip(*cost_BD)])) > 0.004):
+            ri = random.randint(0,len(inputy)-1)
+            TrainingLoopCORE(inputy[ri],output[ri],0)
+            TrainingLoopCORE(output[ri],inputy[ri],1)
     else:
         for a in range(iterations):
-            if isinstance(output[0], list):
-                ri = random.randrangerandrange(len(output))
-                for b in range(number_of_output):
-                    print("running...5")
-                    TrainingLoopL1(inputy,output[ri][b],maximum_value)
-            else:
-                for b in range(len(output)):
-                    print("running...6")
-                    TrainingLoopL1(inputy,output[ri][b],maximum_value)
-
-            if isinstance(inputy[0], list):
-                ri = random.randrangerandrange(len(inputy))
-                for b in range(number_of_input):
-                    print("running...7")
-                    TrainingLoopL1(output,inputy[ri][b],maximum_value)
-            else:
-                for b in range(len(inputy)):
-                    print("running...8")
-                    TrainingLoopL1(output,inputy[ri][b],maximum_value)
+            TrainingLoopCORE(inputy[ri],output[ri],0)
+            TrainingLoopCORE(output[ri],inputy[ri],1)
     wbUpdate(2)
     
             
     
 def influx(inputy):
+    global number_of_inputs
+    global number_of_outputs
+    global list_of_bias_and_weight_values
+    global list_of_bias_and_weight_values_BD
+    global maxValuesListi
+    global maxValuesListo
+
     z = 0
     results = []
-    for x in (number_of_weight_values):
-        for i in (number_of_weight_bias_value_sets):
-                z += (inputy[i]*list_of_bias_and_weight_values[i]) 
-        z += list_of_bias_and_weight_values[number_of_weight_values]
-        results[x] = maximum_value_of_set*normsigmoid(z)
+    for a in range(number_of_outputs):
+            z = 0
+            for i in range(number_of_inputs):
+                z += (float(inputy[i])*float(list_of_bias_and_weight_values[a][i])) 
+            z += float(list_of_bias_and_weight_values[a][-1])
+            pred = maxValuesListi[a] * normsigmoid(z)
+            results.append(pred)
     return results
 
 def efflux(output):
+    global number_of_inputs
+    global number_of_outputs
+    global list_of_bias_and_weight_values
+    global list_of_bias_and_weight_values_BD
+    global maxValuesListi
+    global maxValuesListo
+
     z = 0
     results = []
-    for x in (number_of_weight_values_BD):
-        for i in (number_of_weight_bias_value_sets_BD):
-                z += (output[i]*list_of_bias_and_weight_values_BD[i]) 
-        z += list_of_bias_and_weight_values_BD[number_of_weight_values_BD]
-        results[x] = maximum_value_of_set_BD*normsigmoid(z)
+    for a in range(number_of_inputs):
+            z = 0
+            for i in range(number_of_outputs):
+                z += (float(output[i])*float(list_of_bias_and_weight_values_BD[a][i])) 
+            z += float(list_of_bias_and_weight_values_BD[a][-1])
+            pred = maxValuesListo[a] * normsigmoid(z)
+            results.append(pred)
     return results
 
 #NEW; PUT THIS IN Basic Toolbox PROGRAM
@@ -297,9 +328,6 @@ import time
 from urllib.request import urlopen
 from datetime import datetime
 
-
-
-
 def internet_on():
     try:
         urllib.request.urlopen('http://google.com', timeout=1)
@@ -329,6 +357,7 @@ while True:
         currentPressure = data['main']['pressure']
         currentTime = int(now.strftime('%H%M%S'))
         currentDate = int(now.strftime("%d%m"))
+        print("Current Temp, Pres, Date, and Time:" + currentTemperature + ", " + currentPressure + ", " + currentDate + ", " + currentTime)
 
         
         
@@ -349,7 +378,7 @@ while True:
             #confusing yes, but it should work if everything else works
             currentResult = influx(output)
 
-            print("Current Temp, Pres, Date, and Time:" + currentTemperature + ", " + currentPressure + ", " + currentDate + ", " + currentTime)
+            
             print("Future Temp, Pres, Date, and Time:" + currentResult[0] + ", " + currentResult[1] + ", " + currentResult[3] + ", " + currentResult[2])
             temp[0] = currentTemperature
             pres[0] = currentPressure
@@ -363,4 +392,4 @@ while True:
             date.append(currentDate)
 
             
-        time.sleep(1)
+        time.sleep(3600)
