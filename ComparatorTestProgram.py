@@ -32,10 +32,12 @@ alpha = []
 alpha_BD = []
 
 def normsigmoid(x,b):
-    return 1/(1+np.exp(-x*(1/(b/10))))
+    maximumDXvalue = (2*(np.exp(2)))/b
+    return 1/(1+np.exp(-x*maximumDXvalue))
 
 def normsigmoid_p(x,b):
-    return normsigmoid(x,b) * (1-normsigmoid(x,b))
+    maximumDXvalue = (2*(np.exp(2)))/b
+    return (maximumDXvalue)*(normsigmoid(x,b) * (1-normsigmoid(x,b)))
 
 
 class Error(Exception):
@@ -105,11 +107,13 @@ def wbUpdate(mode):
             datafile.write(float(list_of_bias_and_weight_values_BD[a].strip()))
     if(mode == 2):
         datafile = open("Neuron-DataTESTINGNODE.txt","w")
+        flat_bwlist = [item for sublist in list_of_bias_and_weight_values for item in sublist]
         for a in range(len(list_of_bias_and_weight_values) * len(list_of_bias_and_weight_values[0])):
-            datafile.write(float(list_of_bias_and_weight_values[a].strip()))
+            datafile.write(str(float(flat_bwlist[a]))+"\n")
         datafile = open("Neuron-Data_BDTESTINGNODE.txt","w")
+        flat_bw_BDlist = [item for sublist in list_of_bias_and_weight_values_BD for item in sublist]
         for a in range(len(list_of_bias_and_weight_values_BD) * len(list_of_bias_and_weight_values_BD[0])):
-            datafile.write(float(list_of_bias_and_weight_values_BD[a].strip()))
+            datafile.write(str(float(flat_bw_BDlist[a]))+"\n")
 
 #NEW: Created TRAININGLOOP to minimize the code clutter
 def TrainingLoopCORE(inputy,output,mode):
@@ -135,60 +139,53 @@ def TrainingLoopCORE(inputy,output,mode):
             for i in range(number_of_inputs):
                 z += (float(inputy[i])*float(list_of_bias_and_weight_values[a][i])) 
             z += float(list_of_bias_and_weight_values[a][-1])
-            print("value of z" + str(z))
-            print("max value; " + str(maxValuesListi[a]))
-            print("norm sigmoid value: " + str(float(normsigmoid(float(z),maximumZ))))
-            print("derivative of norm sigmoid value: " + str(normsigmoid_p(z,maximumZ)))
+            #print("value of z: "+str(z))
             pred = maxValuesListi[a] * normsigmoid(z,maximumZ)
-            print("pred value; " + str(pred))
+            print("pred: "+str(pred))
             target = output[a]
-            print("target value; " + str(target))
-            cost[a][1] = (np.square(pred - target))
+            print("target: "+str(target))
+            cost[a][1] = (np.square((pred - target)/maxValuesListi[a]))
 
-            dcost_dpred = 2 * (pred - target)
-            print("dcost_dpred: " + str(dcost_dpred))
-            dpred_dz = maxValuesListi[a] * normsigmoid_p(z,maximumZ)
+            dcost_dpred = 2 * ((pred - target)/maxValuesListi[a])
 
-            print("dpred_dz: " + str(dpred_dz))
+            dpred_dz = maxValuesListi[a]*normsigmoid_p(z,maximumZ)
+
             dcost_dz = dcost_dpred * dpred_dz
             
             for i in range(number_of_inputs):
-                print("alpha: " + str(alpha[a]))
-                print("dcostdz: " + str(dcost_dz))
-                print("input point: " + str(inputy[i]))
-                print("weight delta :" + str(alpha[a] * dcost_dz * inputy[i]))
-                list_of_bias_and_weight_values[a][i] = float(list_of_bias_and_weight_values[a][i]) - alpha[a] * dcost_dz * inputy[i]
-                print("weight "+ str(i) + " value: " + str(list_of_bias_and_weight_values[a][i]))
-            list_of_bias_and_weight_values[a][number_of_inputs] = float(list_of_bias_and_weight_values[a][number_of_inputs]) - alpha[a] * dcost_dz
-            print("bias value: " + str(list_of_bias_and_weight_values[a][number_of_inputs]))
-            print("previous cost:" + str(cost[a][0]))
-            print("new cost:" + str(cost[a][1]))
+                list_of_bias_and_weight_values[a][i] = float(list_of_bias_and_weight_values[a][i]) - alpha[a] * dcost_dz * (inputy[i]/maxValuesListi[a])
+                #print("weight " + str(i+1) +" of set " + str(a) + " value: " + str(list_of_bias_and_weight_values[a][i]))
+
+            list_of_bias_and_weight_values[a][-1] = float(list_of_bias_and_weight_values[a][-1]) - alpha[a] * dcost_dz
+
             cost[a][0] = cost[a][1]
             
     if(mode==1):
         for a in range(number_of_inputs):
-
             z = 0
             for i in range(number_of_outputs):
                 z += (float(inputy[i])*float(list_of_bias_and_weight_values_BD[a][i])) 
             z += float(list_of_bias_and_weight_values_BD[a][-1])
 
             pred = maxValuesListo[a] * normsigmoid(z,maximumZ_BD)
+            #print("pred: "+str(pred))
             target = output[a]
+            #print("target: "+str(target))
+            cost_BD[a][1] = (np.square((pred - target)/maxValuesListo[a]))
 
-            cost_BD[a].append(np.square(pred - target))
+            dcost_dpred = 2 * ((pred - target)/maxValuesListo[a])
 
-            dcost_dpred = 2 * (pred - target)
-            dpred_dz = maxValuesListo[a] * normsigmoid_p(z,maximumZ_BD)
+            dpred_dz = maxValuesListo[a]*normsigmoid_p(z,maximumZ_BD)
+
+
             dcost_dz = dcost_dpred * dpred_dz
             
             for i in range(number_of_outputs):
-                list_of_bias_and_weight_values_BD[a][i] = float(list_of_bias_and_weight_values_BD[a][i]) - alpha_BD[a] * float(list_of_bias_and_weight_values_BD[a][i]) * dcost_dz
-            
-            if(cost_BD[a][1]>cost_BD[a][0]):
-                alpha_BD[a]+=0.01
-            if((cost_BD[a][1]-cost_BD[a][0])<-0.5):
-                alpha_BD[a]-=0.01
+
+                list_of_bias_and_weight_values_BD[a][i] = float(list_of_bias_and_weight_values_BD[a][i]) - alpha_BD[a] * dcost_dz * (inputy[i]/maxValuesListo[a])
+
+            list_of_bias_and_weight_values_BD[a][-1] = float(list_of_bias_and_weight_values_BD[a][-1]) - alpha_BD[a] * dcost_dz
+
             cost_BD[a][0] = cost_BD[a][1]
 
 
@@ -207,50 +204,84 @@ def Trainer(inputy, output, iterations):
     global maximumZ_BD
     
 
-    maxValuesListi = [max(elem) for elem in zip(*output)]
-    maxValuesListo = [max(elem) for elem in zip(*inputy)]
-
 
     if isinstance(inputy[0], list):
         number_of_inputs = len(inputy[0])
+        maxValuesListi = [max(elem) for elem in zip(*output)]
+        maximumZ = sum([max(elem) for elem in zip(*output)])
+        
     else:
         number_of_inputs = len(inputy)
 
     if isinstance(output[0], list):
-        number_of_outputs = len(output[0])    
+        number_of_outputs = len(output[0])
+        maxValuesListo = [max(elem) for elem in zip(*inputy)] 
+        maximumZ_BD = sum([max(elem) for elem in zip(*inputy)])   
     else:
         number_of_outputs = len(output)
 
-    print("Number of inputs: " + str(number_of_inputs))
-    print("Number of outputs: " + str(number_of_outputs))
-    maximumZ = sum([max(elem) for elem in zip(*output)])
-    maximumZ_BD = sum([max(elem) for elem in zip(*inputy)])
 
     fileLoad()
 
-    for x in range(number_of_outputs):
+    for j in range(number_of_inputs):
         costi = []
         costi.append(10)
         costi.append(10)
         cost.append(costi)
         alpha.append(0.2)
-    for y in range(number_of_outputs):
+    for k in range(number_of_outputs):
         costo = []
         costo.append(10)
         costo.append(10)
         cost_BD.append(costo)
         alpha_BD.append(0.2)
-
-    if (iterations == 0):
-        while(float(sum([sum(i) for i in zip(*cost)])) > 0.004 and  float(sum([sum(i) for i in zip(*cost_BD)])) > 0.004):
-            ri = random.randint(0,len(inputy)-1)
-            TrainingLoopCORE(inputy[ri],output[ri],0)
-            TrainingLoopCORE(output[ri],inputy[ri],1)
+    
+    print((sum([sum(i) for i in zip(*cost)])))
+    if (isinstance(inputy[0], list) and isinstance(output[0], list)): 
+        if (iterations == 0):
+            while(float(sum([sum(i) for i in zip(*cost)])) > 0.00001 and float(sum([sum(i) for i in zip(*cost_BD)])) > 0.00001):
+                ri = random.randint(0,len(inputy)-1)
+                TrainingLoopCORE(inputy[ri],output[ri],0)
+                TrainingLoopCORE(output[ri],inputy[ri],1)
+        else:
+            for a in range(iterations):
+                ri = random.randint(0,len(inputy)-1)
+                TrainingLoopCORE(inputy[ri],output[ri],0)
+                TrainingLoopCORE(output[ri],inputy[ri],1)
+    elif (isinstance(inputy[0], list) and (isinstance(output[0], float) or isinstance(output[0], int))): 
+        if (iterations == 0):
+            while(float(sum([sum(i) for i in zip(*cost)])) > 0.01 and float(sum([sum(i) for i in zip(*cost_BD)])) > 0.01):
+                ri = random.randint(0,len(inputy)-1)
+                TrainingLoopCORE(inputy[ri],output,0)
+                TrainingLoopCORE(output,inputy[ri],1)
+        else:
+            for a in range(iterations):
+                ri = random.randint(0,len(inputy)-1)
+                TrainingLoopCORE(inputy[ri],output,0)
+                TrainingLoopCORE(output,inputy[ri],1)
+    elif (isinstance(output[0], list) and (isinstance(inputy[0], float) or isinstance(inputy[0], int))): 
+        if (iterations == 0):
+            while(float(sum([sum(i) for i in zip(*cost)])) > 0.01 and  float(sum([sum(i) for i in zip(*cost_BD)])) > 0.01):
+                ri = random.randint(0,len(inputy)-1)
+                TrainingLoopCORE(inputy,output[ri],0)
+                TrainingLoopCORE(output[ri],inputy,1)
+        else:
+            for a in range(iterations):
+                ri = random.randint(0,len(inputy)-1)
+                TrainingLoopCORE(inputy,output[ri],0)
+                TrainingLoopCORE(output[ri],inputy,1)
     else:
-        for a in range(iterations):
-            TrainingLoopCORE(inputy[ri],output[ri],0)
-            TrainingLoopCORE(output[ri],inputy[ri],1)
+        if (iterations == 0):
+            while(float(sum([sum(i) for i in zip(*cost)])) > 0.01 and  float(sum([sum(i) for i in zip(*cost_BD)])) > 0.01):
+                TrainingLoopCORE(inputy,output,0)
+                TrainingLoopCORE(output,inputy,1)
+        else:
+            for a in range(iterations):
+                TrainingLoopCORE(inputy,output,0)
+                TrainingLoopCORE(output,inputy,1)
     wbUpdate(2)
+    cost=[]
+    cost_BD=[]
     
             
     
@@ -261,6 +292,8 @@ def influx(inputy):
     global list_of_bias_and_weight_values_BD
     global maxValuesListi
     global maxValuesListo
+    global maximumZ
+    global maximumZ_BD
 
     z = 0
     results = []
@@ -269,7 +302,7 @@ def influx(inputy):
             for i in range(number_of_inputs):
                 z += (float(inputy[i])*float(list_of_bias_and_weight_values[a][i])) 
             z += float(list_of_bias_and_weight_values[a][-1])
-            pred = maxValuesListi[a] * normsigmoid(z)
+            pred = maxValuesListi[a] * normsigmoid(z,maximumZ)
             results.append(pred)
     return results
 
@@ -308,10 +341,10 @@ def fauxDataGen(iData, oData, numPoints):
         fauxDatai2 = []
         fauxDatao2 = []
         for a in range(len(iData)):            
-            fauxDatai2.append(random.uniform(iData[a][0], iData[a][1]))
+            fauxDatai2.append(random.randint(iData[a][0], iData[a][1]))
         fauxDatai.append(fauxDatai2)
         for b in range(len(oData)):
-            fauxDatao2.append(random.uniform(oData[b][0], oData[b][1]))
+            fauxDatao2.append(random.randint(oData[b][0], oData[b][1]))
         fauxDatao.append(fauxDatao2)
 
     fauxData.append(fauxDatai)
@@ -338,26 +371,23 @@ def internet_on():
 
 while True:
     temp = []
-    pres = []
     timex = []
     date = []
     print("Warming up the model...")
-    fauxDataWeather = fauxDataGen([[41,71],[1010,1040],[0,2359],[1201,1231]],[[41,71],[1010,1040],[0,2359],[1201,1231]],1000)
-    Trainer(fauxDataWeather[0], fauxDataWeather[1] , 0)
+    weatherModel =[[[49,1700,1229],[49,1800,1229],[50,1900,1229],[51,2000,1229],[51,2100,1229],[52,2200,1229],[52,2300,1229]],[[49,1800,1229],[50,1900,1229],[51,2000,1229],[51,2100,1229],[51,2200,1229],[52,2300,1229],[52,0,1230]]] 
+    Trainer(weatherModel[0],weatherModel[1],0)
     print("Training complete!\n")
     print("Commencing weather prediction model...")
     while(internet_on()):
-        print("aw shit time to work again\n")
         now = datetime.now()
         #Problem: Link likes to time out for some reason. Need a more reliable connection. Free, if possible.
         url = 'http://api.openweathermap.org/data/2.5/weather?q=Isla%20Vista,us&mode=json&appid=bca9a5620f4d14d334e732bd8719286b&units=imperial'
         res = requests.get(url)
         data = res.json()
         currentTemperature = data['main']['temp']
-        currentPressure = data['main']['pressure']
-        currentTime = int(now.strftime('%H%M%S'))
-        currentDate = int(now.strftime("%d%m"))
-        print("Current Temp, Pres, Date, and Time:" + currentTemperature + ", " + currentPressure + ", " + currentDate + ", " + currentTime)
+        currentTime = int(now.strftime('%H%M'))
+        currentDate = int(now.strftime("%m%d"))
+        print("Current Temp, Date, and Time:" + str(currentTemperature) + ", " + str(currentTime) + ", " + str(currentDate))
 
         
         
@@ -365,31 +395,28 @@ while True:
 
         if(len(temp) == 2):
             temp[1] = currentTemperature
-            pres[1] = currentPressure
             timex[1] = currentTime
             date[1] = currentDate
-            inputa = [temp[0],pres[0],timex[0],date[0]]
-            output = [temp[1],pres[1],timex[1],date[1]]
+            inputa = [temp[0],timex[0],date[0]]
+            output = [temp[1],timex[1],date[1]]
 
             #Line below adjusts weights and bias live
-            Trainer(inputa, output , 0)
+            Trainer([temp[0],timex[0],date[0]], [currentTemperature,currentTime,currentDate] , 0)
 
             #Line below outputs from current data for future data
             #confusing yes, but it should work if everything else works
-            currentResult = influx(output)
+            currentResult = influx(inputa)
 
             
-            print("Future Temp, Pres, Date, and Time:" + currentResult[0] + ", " + currentResult[1] + ", " + currentResult[3] + ", " + currentResult[2])
+            print("Temp, Date and Time Guess based on current conditions:" + str(currentResult[0]) + ", " + str(currentResult[1])+", " + str(currentResult[2]))
             temp[0] = currentTemperature
-            pres[0] = currentPressure
             timex[0] = currentTime
             date[0] = currentDate
         else:
             print("Not enough data! Please wait for next data collection cycle.")
             temp.append(currentTemperature)
-            pres.append(currentPressure)
             timex.append(currentTime)
             date.append(currentDate)
 
             
-        time.sleep(3600)
+        time.sleep(10)
