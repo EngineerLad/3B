@@ -191,7 +191,7 @@ class ComparatorNode():
         # and when both input and output are points.
         if (isinstance(inputy[0], list) and isinstance(output[0], list)): 
             if (iterations == 0):
-                while(float(sum([sum(i) for i in zip(*cost)])) > 0.00001 and float(sum([sum(i) for i in zip(*cost_BD)])) > 0.00001):
+                while(float(sum([sum(i) for i in zip(*cost)])) > 0.001 and float(sum([sum(i) for i in zip(*cost_BD)])) > 0.001):
                     ri = random.randint(0,len(inputy)-1)
                     TrainingLoopCORE(inputy[ri],output[ri])
             else:
@@ -200,7 +200,7 @@ class ComparatorNode():
                     TrainingLoopCORE(inputy[ri],output[ri])
         elif (isinstance(inputy[0], list) and (isinstance(output[0], float) or isinstance(output[0], int))): 
             if (iterations == 0):
-                while(float(sum([sum(i) for i in zip(*cost)])) > 0.01 and float(sum([sum(i) for i in zip(*cost_BD)])) > 0.01):
+                while(float(sum([sum(i) for i in zip(*cost)])) > 0.001 and float(sum([sum(i) for i in zip(*cost_BD)])) > 0.001):
                     ri = random.randint(0,len(inputy)-1)
                     TrainingLoopCORE(inputy[ri],output)
             else:
@@ -209,7 +209,7 @@ class ComparatorNode():
                     TrainingLoopCORE(inputy[ri],output)
         elif (isinstance(output[0], list) and (isinstance(inputy[0], float) or isinstance(inputy[0], int))): 
             if (iterations == 0):
-                while(float(sum([sum(i) for i in zip(*cost)])) > 0.01 and  float(sum([sum(i) for i in zip(*cost_BD)])) > 0.01):
+                while(float(sum([sum(i) for i in zip(*cost)])) > 0.001 and  float(sum([sum(i) for i in zip(*cost_BD)])) > 0.001):
                     ri = random.randint(0,len(inputy)-1)
                     TrainingLoopCORE(inputy,output[ri])
             else:
@@ -218,7 +218,7 @@ class ComparatorNode():
                     TrainingLoopCORE(inputy,output[ri])
         else:
             if (iterations == 0):
-                while(float(sum([sum(i) for i in zip(*cost)])) > 0.01 and  float(sum([sum(i) for i in zip(*cost_BD)])) > 0.01):
+                while(float(sum([sum(i) for i in zip(*cost)])) > 0.001 and  float(sum([sum(i) for i in zip(*cost_BD)])) > 0.001):
                     TrainingLoopCORE(inputy,output)
             else:
                 for a in range(iterations):
@@ -226,6 +226,8 @@ class ComparatorNode():
         #these variables are getting saved into each instance's values because they are persistent values necessary in defining the model that has been trained.
         self.variables["cost"] = []
         self.variables["cost_BD"] = []
+        self.variables["alpha"] = []
+        self.variables["alpha_BD"] = []
         self.variables["number_of_inputs"] = number_of_inputs
         self.variables["number_of_outputs"] = number_of_outputs
         self.variables["maximumZ"] = maximumZ
