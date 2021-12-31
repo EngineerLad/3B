@@ -95,9 +95,9 @@ class ComparatorNode():
                 #internal alpha adjustment: if the cost is somehow larger than the previous, it increases the alpha value. 
                 # If the average change in cost is more than the new cost, it decreases the alpha value.
                 if(cost[a][1]>cost[a][0]):
-                    alpha+=0.01
+                    alpha[a]+=0.01
                 if(((cost[a][0]-cost[a][1])/2)>cost[a][1]):
-                    alpha-=0.01
+                    alpha[a]-=0.01
                 cost[a][0] = cost[a][1]
             #this is the same as the above but the reverse process to enable backdriveability
             for a in range(number_of_inputs):
